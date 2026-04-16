@@ -18,6 +18,32 @@ const GOLD_PRICE_PER_G = {
 
 const GOLD_ALLOY_ORDER = [999, 900, 958, 850, 750, 583, 585, 500, 375];
 
+/**
+ * URL развёрнутого веб-приложения Google Apps Script (раздел «Развернуть» → URL вида …/exec).
+ * Оставьте пустым — запись в таблицу отключена. См. файл precalc-apps-script.gs в этой папке.
+ */
+const PRECALC_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbxiybyiD9d1dIU9XnoHdZwYmMgN-GXjdMSqxKL40Q8-frm7Y4WHJGOJ7MNIwQG8EEE/exec';
+
+let precalcSubmitTimer = null;
+
+/** Отправка строки: время, проба, масса, оценка (₽) */
+function submitPrecalcRow(prob, grams, estimateRub) {
+  if (!PRECALC_SCRIPT_URL || typeof prob === 'undefined' || prob === '') return;
+  if (!Number.isFinite(grams) || grams <= 0) return;
+  const estimate = Math.round(estimateRub);
+  if (!Number.isFinite(estimate)) return;
+  const time = new Date().toISOString();
+  const params = new URLSearchParams({
+    time,
+    prob: String(prob),
+    grams: String(grams),
+    estimate: String(estimate),
+  });
+  const url = `${PRECALC_SCRIPT_URL}${PRECALC_SCRIPT_URL.includes('?') ? '&' : '?'}${params.toString()}`;
+  fetch(url, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+}
+
 function formatRub(n) {
   return `${Math.round(n).toLocaleString('ru-RU')} ₽`;
 }
@@ -27,6 +53,14 @@ function initGoldCalculator() {
   const gramsEl = document.getElementById('calcGrams');
   const resultEl = document.getElementById('calcResult');
   if (!alloyEl || !gramsEl || !resultEl) return;
+
+  function scheduleSheetSubmit(prob, grams, sum) {
+    if (!PRECALC_SCRIPT_URL) return;
+    clearTimeout(precalcSubmitTimer);
+    precalcSubmitTimer = setTimeout(() => {
+      submitPrecalcRow(prob, grams, sum);
+    }, 1200);
+  }
 
   function update() {
     const prob = alloyEl.value;
@@ -48,6 +82,7 @@ function initGoldCalculator() {
     const sum = price * grams;
     resultEl.textContent = `Сможете получить до ${formatRub(sum)}`;
     resultEl.classList.add('calc__result--visible');
+    scheduleSheetSubmit(prob, grams, sum);
   }
 
   alloyEl.addEventListener('change', update);
@@ -183,6 +218,17 @@ function renderLanding() {
   `;
   initGoldCalculator();
   document.getElementById('sendBtn').onclick = () => {
+    const alloyEl = document.getElementById('calcAlloy');
+    const gramsEl = document.getElementById('calcGrams');
+    if (alloyEl && gramsEl && PRECALC_SCRIPT_URL) {
+      clearTimeout(precalcSubmitTimer);
+      const prob = alloyEl.value;
+      const grams = parseFloat(String(gramsEl.value).replace(',', '.'));
+      const price = prob ? GOLD_PRICE_PER_G[prob] : 0;
+      if (prob && price && Number.isFinite(grams) && grams > 0) {
+        submitPrecalcRow(prob, grams, price * grams);
+      }
+    }
     sendAnalyticsEvent(`7257_click_continue_var${VARIANT}`, `7257_click_continue_var${VARIANT}`);
     localStorage.setItem(`7257_placeholderShown_var${VARIANT}`, '1');
     renderPlaceholder();
