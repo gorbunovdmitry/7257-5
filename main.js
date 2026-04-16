@@ -23,11 +23,9 @@ const GOLD_ALLOY_ORDER = [999, 900, 958, 850, 750, 583, 585, 500, 375];
  * Оставьте пустым — запись в таблицу отключена. См. файл precalc-apps-script.gs в этой папке.
  */
 const PRECALC_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbxiybyiD9d1dIU9XnoHdZwYmMgN-GXjdMSqxKL40Q8-frm7Y4WHJGOJ7MNIwQG8EEE/exec';
+  'https://script.google.com/macros/s/AKfycbyWV1Fw7RVgGzPtFgiB2yRBjplgEqmLOvopxG0_zE1hcIjKKciukZHXGGzTjrbOR1Q/exec';
 
-let precalcSubmitTimer = null;
-
-/** Отправка строки: время, проба, масса, оценка (₽) */
+/** Отправка строки: время, проба, масса, оценка (₽) — вызывается только по клику «Оставить заявку» */
 function submitPrecalcRow(prob, grams, estimateRub) {
   if (!PRECALC_SCRIPT_URL || typeof prob === 'undefined' || prob === '') return;
   if (!Number.isFinite(grams) || grams <= 0) return;
@@ -54,14 +52,6 @@ function initGoldCalculator() {
   const resultEl = document.getElementById('calcResult');
   if (!alloyEl || !gramsEl || !resultEl) return;
 
-  function scheduleSheetSubmit(prob, grams, sum) {
-    if (!PRECALC_SCRIPT_URL) return;
-    clearTimeout(precalcSubmitTimer);
-    precalcSubmitTimer = setTimeout(() => {
-      submitPrecalcRow(prob, grams, sum);
-    }, 1200);
-  }
-
   function update() {
     const prob = alloyEl.value;
     const price = prob ? GOLD_PRICE_PER_G[prob] : 0;
@@ -82,7 +72,6 @@ function initGoldCalculator() {
     const sum = price * grams;
     resultEl.textContent = `Сможете получить до ${formatRub(sum)}`;
     resultEl.classList.add('calc__result--visible');
-    scheduleSheetSubmit(prob, grams, sum);
   }
 
   alloyEl.addEventListener('change', update);
@@ -221,7 +210,6 @@ function renderLanding() {
     const alloyEl = document.getElementById('calcAlloy');
     const gramsEl = document.getElementById('calcGrams');
     if (alloyEl && gramsEl && PRECALC_SCRIPT_URL) {
-      clearTimeout(precalcSubmitTimer);
       const prob = alloyEl.value;
       const grams = parseFloat(String(gramsEl.value).replace(',', '.'));
       const price = prob ? GOLD_PRICE_PER_G[prob] : 0;
