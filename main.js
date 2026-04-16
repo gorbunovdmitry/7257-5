@@ -202,9 +202,6 @@ function renderPlaceholder() {
       <div class="placeholder__desc">
         Мы выбираем лучшие условия, чтобы вам точно понравилось. С нетерпением ждём, когда всё заработает, чтобы показать вам.
       </div>
-      <div class="placeholder__action">
-        Пока можете подключить Альфа-Смарт или семейный тариф
-      </div>
     </div>
   `;
   history.replaceState(null, '', location.href);
