@@ -119,7 +119,7 @@ function renderLanding() {
             <img src="img/Subtract.png" alt="" class="benefits__icon-img" width="96" height="96" decoding="async" />
           </div>
           <p class="benefits__text">
-            Хорошая история взаимодействия может учитываться при рассмотрении кредитных продуктов Альфа-Банка
+            Хорошая история взаимодействия может положительно учитываться при рассмотрении кредитных продуктов Альфа-Банка
           </p>
         </div>
       </section>
