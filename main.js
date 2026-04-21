@@ -1,6 +1,6 @@
 const app = document.getElementById('app');
 
-/** Номер варианта (как в папке 7257-N) */
+/** Номер варианта (как в папке 7619-N) */
 const VARIANT = '5';
 
 /** Цена за 1 г по пробе (₽) — предоценка */
@@ -90,10 +90,10 @@ function sendAnalyticsEvent(gaEvent, ymEvent) {
 
 function renderLanding() {
   if (!sessionStorage.getItem(`landingViewed_var${VARIANT}`)) {
-    sendAnalyticsEvent(`7257_page_view_var${VARIANT}`, `7257_page_view_var${VARIANT}`);
+    sendAnalyticsEvent(`7619_page_view_var${VARIANT}`, `7619_page_view_var${VARIANT}`);
     sessionStorage.setItem(`landingViewed_var${VARIANT}`, '1');
   }
-  if (localStorage.getItem(`7257_placeholderShown_var${VARIANT}`) === '1') {
+  if (localStorage.getItem(`7619_placeholderShown_var${VARIANT}`) === '1') {
     renderPlaceholder();
     return;
   }
@@ -217,8 +217,8 @@ function renderLanding() {
         submitPrecalcRow(prob, grams, price * grams);
       }
     }
-    sendAnalyticsEvent(`7257_click_continue_var${VARIANT}`, `7257_click_continue_var${VARIANT}`);
-    localStorage.setItem(`7257_placeholderShown_var${VARIANT}`, '1');
+    sendAnalyticsEvent(`7619_click_continue_var${VARIANT}`, `7619_click_continue_var${VARIANT}`);
+    localStorage.setItem(`7619_placeholderShown_var${VARIANT}`, '1');
     renderPlaceholder();
     history.replaceState(null, '', location.href);
   };
@@ -226,7 +226,7 @@ function renderLanding() {
 
 function renderPlaceholder() {
   if (!sessionStorage.getItem(`endPageViewed_var${VARIANT}`)) {
-    sendAnalyticsEvent(`7257_end_page_view_var${VARIANT}`, `7257_end_page_view_var${VARIANT}`);
+    sendAnalyticsEvent(`7619_end_page_view_var${VARIANT}`, `7619_end_page_view_var${VARIANT}`);
     sessionStorage.setItem(`endPageViewed_var${VARIANT}`, '1');
   }
   app.innerHTML = `
